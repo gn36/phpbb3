@@ -3,8 +3,8 @@
 <project name="phpBB" description="The phpBB forum software" default="all" basedir="../">
 	<!-- a few settings for the build -->
 	<property name="newversion" value="3.0.13-deutsch" />
-	<property name="prevversion" value="3.0.13-RC1-deutsch" />
-	<property name="olderversions" value="3.0.6-deutsch, 3.0.7-deutsch, 3.0.7-PL1-deutsch, 3.0.8-deutsch, 3.0.9-deutsch, 3.0.10-deutsch, 3.0.11-deutsch, 3.0.12-deutsch" />
+	<property name="prevversion" value="3.0.12-deutsch" />
+	<property name="olderversions" value="3.0.12" />
 	<!-- no configuration should be needed beyond this point -->
 
 	<property name="oldversions" value="${olderversions}, ${prevversion}" />
@@ -130,7 +130,7 @@
 	</target>
 
 	<target name="package" depends="clean,prepare,prepare-new-version,old-version-diffs">
-		<exec dir="build" command="php -f package.php '${versions}' > logs/package.log" escape="false" />
+		<exec dir="build" command="php -f package.php ${versions} > logs/package.log" escape="false" />
 		<exec dir="build" escape="false"
 			command="diff -crNEBwd old_versions/release-${prevversion}/language new_version/phpBB3/language >
 				save/phpbb-${prevversion}_to_${newversion}_language.patch" />
@@ -193,14 +193,16 @@
 		and set correct permissions.
 	-->
 	<target name="export">
+		<echo msg="Executing Git Archive ${revision} /${dir}" />
 		<exec dir="phpBB"
 			command="git archive ${revision} | tar -xf - -C ../${dir}"
 			checkreturn="true" />
 
 		<!-- Install composer dependencies, if there are any. -->
+		<echo msg="Installing dependencies, if any" />
 		<exec dir="${dir}"
 			command='php -r "\$j = json_decode(file_get_contents(\"composer.json\")); echo isset(\$j->require);"'
-			checkreturn="true"
+			
 			outputProperty='composer-has-dependencies' />
 		<if>
 			<equals arg1="${composer-has-dependencies}" arg2="1" trim="true" />
@@ -234,7 +236,7 @@
 				<delete file="${dir}/composer.lock" />
 			</else>
 		</if>
-
+		<echo msg="Removing unnecessary files" />
 		<delete file="${dir}/config.php" />
 		<delete dir="${dir}/develop" />
 		<delete dir="${dir}/install/data" />

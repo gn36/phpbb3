@@ -15,7 +15,10 @@ if ($_SERVER['argc'] < 2)
 	die("Please specify a list of versions as the first argument (e.g. package.php '1.0.0, 1.0.1, 1.0.2').");
 }
 
-$versions = explode(',', $_SERVER['argv'][1]);
+//$versions = explode(',', $_SERVER['argv'][1]);
+$tmp = $_SERVER['argv'];
+$tmp[0] = '';
+$versions = explode(',', implode(' ', $tmp));
 $versions = array_map('trim', $versions);
 
 $verbose = true;
