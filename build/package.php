@@ -15,7 +15,10 @@ if ($_SERVER['argc'] < 2)
 	die("Please specify a list of versions as the first argument (e.g. package.php '1.0.0, 1.0.1, 1.0.2').");
 }
 
-$versions = explode(',', $_SERVER['argv'][1]);
+//$versions = explode(',', $_SERVER['argv'][1]);
+$tmp = $_SERVER['argv'];
+$tmp[0] = '';
+$versions = explode(',', implode(' ', $tmp));
 $versions = array_map('trim', $versions);
 
 $verbose = true;
@@ -216,7 +219,7 @@ if (!defined(\'IN_PHPBB\'))
 
 // Set update info with file structure to update
 $update_info = array(
-	\'version\'	=> array(\'from\' => \'' . str_replace('_to_', '', $package->old_packages[$_package_name]) . '\', \'to\' => \'' . $package->get('new_version_number') . '\'),
+	\'version\'   => array(\'from\' => \'' . str_replace(array('_to_', '-deutsch'), '', $package->old_packages[$_package_name]) . '\', \'to\' => \'' . str_replace('-deutsch', '', $package->get('new_version_number')) . '\'),
 ';
 
 		if (sizeof($file_contents['all']))

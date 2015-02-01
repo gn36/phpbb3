@@ -11,7 +11,7 @@
 	<property name="versions" value="${oldversions}, ${newversion}" />
 
 	<!-- These are the main targets which you will probably want to use -->
-	<target name="all" depends="clean,prepare,composer,test,docs,package" />
+	<target name="all" depends="clean,prepare,composer,package" />
 	<target name="build" depends="clean,prepare,composer,test,docs" />
 
 	<target name="prepare">
@@ -130,7 +130,7 @@
 	</target>
 
 	<target name="package" depends="clean,prepare,prepare-new-version,old-version-diffs">
-		<exec dir="build" command="php -f package.php '${versions}' > logs/package.log" escape="false" />
+		<exec dir="build" command="php -f package.php ${versions} > logs/package.log" escape="false" />
 		<exec dir="build" escape="false"
 			command="diff -crNEBwd old_versions/release-${prevversion}/language new_version/phpBB3/language >
 				save/phpbb-${prevversion}_to_${newversion}_language.patch" />
@@ -193,14 +193,16 @@
 		and set correct permissions.
 	-->
 	<target name="export">
+		<echo msg="Executing Git Archive ${revision} /${dir}" />
 		<exec dir="phpBB"
 			command="git archive ${revision} | tar -xf - -C ../${dir}"
 			checkreturn="true" />
 
 		<!-- Install composer dependencies, if there are any. -->
+		<echo msg="Installing dependencies, if any" />
 		<exec dir="${dir}"
 			command='php -r "\$j = json_decode(file_get_contents(\"composer.json\")); echo isset(\$j->require);"'
-			checkreturn="true"
+			
 			outputProperty='composer-has-dependencies' />
 		<if>
 			<equals arg1="${composer-has-dependencies}" arg2="1" trim="true" />
@@ -234,7 +236,7 @@
 				<delete file="${dir}/composer.lock" />
 			</else>
 		</if>
-
+		<echo msg="Removing unnecessary files" />
 		<delete file="${dir}/config.php" />
 		<delete dir="${dir}/develop" />
 		<delete dir="${dir}/install/data" />
